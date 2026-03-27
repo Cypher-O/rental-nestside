@@ -1,0 +1,98 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <defs>
+    <!-- Background gradient: deep navy -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0A1628;stop-opacity:1" />
+      <stop offset="55%" style="stop-color:#1E3A5F;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0F2440;stop-opacity:1" />
+    </linearGradient>
+    <!-- Gold gradient for house -->
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#F5B800;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#D4880F;stop-opacity:1" />
+    </linearGradient>
+    <!-- Gold glow -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="18" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <!-- Subtle inner shadow for background -->
+    <filter id="innerShadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feFlood flood-color="#000" flood-opacity="0.2" result="color"/>
+      <feComposite in="color" in2="SourceGraphic" operator="in" result="shadow"/>
+      <feGaussianBlur in="shadow" stdDeviation="15"/>
+      <feMerge>
+        <feMergeNode/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background rounded rect -->
+  <rect width="1024" height="1024" rx="230" ry="230" fill="url(#bgGrad)"/>
+
+  <!-- Subtle dot pattern overlay -->
+  <g opacity="0.06" fill="white">
+    <circle cx="100" cy="100" r="5"/><circle cx="200" cy="100" r="5"/><circle cx="300" cy="100" r="5"/>
+    <circle cx="400" cy="100" r="5"/><circle cx="500" cy="100" r="5"/><circle cx="600" cy="100" r="5"/>
+    <circle cx="700" cy="100" r="5"/><circle cx="800" cy="100" r="5"/><circle cx="900" cy="100" r="5"/>
+    <circle cx="100" cy="200" r="5"/><circle cx="200" cy="200" r="5"/><circle cx="300" cy="200" r="5"/>
+    <circle cx="400" cy="200" r="5"/><circle cx="500" cy="200" r="5"/><circle cx="600" cy="200" r="5"/>
+    <circle cx="700" cy="200" r="5"/><circle cx="800" cy="200" r="5"/><circle cx="900" cy="200" r="5"/>
+    <circle cx="100" cy="900" r="5"/><circle cx="200" cy="900" r="5"/><circle cx="300" cy="900" r="5"/>
+    <circle cx="800" cy="900" r="5"/><circle cx="900" cy="900" r="5"/>
+    <circle cx="900" cy="300" r="5"/><circle cx="900" cy="400" r="5"/>
+    <circle cx="900" cy="700" r="5"/><circle cx="900" cy="800" r="5"/>
+    <circle cx="100" cy="700" r="5"/><circle cx="100" cy="800" r="5"/>
+    <circle cx="100" cy="400" r="5"/><circle cx="100" cy="500" r="5"/>
+  </g>
+
+  <!-- Gold glow blob behind house -->
+  <ellipse cx="512" cy="520" rx="260" ry="220" fill="#D4880F" opacity="0.12" filter="url(#glow)"/>
+
+  <!-- ══ HOUSE SHAPE ══ -->
+  <!-- Roof (triangle/chevron) -->
+  <path d="M 512 195 L 210 460 L 280 460 L 280 760 L 744 760 L 744 460 L 814 460 Z"
+        fill="url(#goldGrad)" filter="url(#glow)"/>
+
+  <!-- Roof shadow (depth) -->
+  <path d="M 512 195 L 210 460 L 280 460 L 280 480 L 210 480 Z"
+        fill="#0A1628" opacity="0.25"/>
+  <path d="M 512 195 L 814 460 L 744 460 L 744 480 L 814 480 Z"
+        fill="#0A1628" opacity="0.25"/>
+
+  <!-- House body (navy, so it sits inside the gold roof nicely) -->
+  <rect x="296" y="456" width="432" height="308" rx="12" fill="#1A3356"/>
+
+  <!-- Door -->
+  <rect x="440" y="600" width="144" height="164" rx="18" fill="url(#goldGrad)"/>
+  <!-- Door panel detail -->
+  <rect x="460" y="620" width="44" height="56" rx="6" fill="#1A3356" opacity="0.35"/>
+  <rect x="520" y="620" width="44" height="56" rx="6" fill="#1A3356" opacity="0.35"/>
+  <!-- Door knob -->
+  <circle cx="498" cy="700" r="9" fill="#1A3356" opacity="0.5"/>
+
+  <!-- Left window -->
+  <rect x="316" y="510" width="100" height="90" rx="10" fill="#D4880F" opacity="0.85"/>
+  <line x1="366" y1="510" x2="366" y2="600" stroke="#1A3356" stroke-width="5" opacity="0.4"/>
+  <line x1="316" y1="555" x2="416" y2="555" stroke="#1A3356" stroke-width="5" opacity="0.4"/>
+
+  <!-- Right window -->
+  <rect x="608" y="510" width="100" height="90" rx="10" fill="#D4880F" opacity="0.85"/>
+  <line x1="658" y1="510" x2="658" y2="600" stroke="#1A3356" stroke-width="5" opacity="0.4"/>
+  <line x1="608" y1="555" x2="708" y2="555" stroke="#1A3356" stroke-width="5" opacity="0.4"/>
+
+  <!-- Chimney -->
+  <rect x="640" y="228" width="56" height="120" rx="8" fill="url(#goldGrad)"/>
+
+  <!-- Location pin on roof peak -->
+  <circle cx="512" cy="195" r="38" fill="#FFFFFF"/>
+  <circle cx="512" cy="190" r="22" fill="#1E3A5F"/>
+  <path d="M 512 230 L 498 210 Q 490 198 512 195 Q 534 198 526 210 Z" fill="#FFFFFF"/>
+
+  <!-- Ground line -->
+  <rect x="240" y="760" width="544" height="12" rx="6" fill="url(#goldGrad)" opacity="0.5"/>
+</svg>
