@@ -35,6 +35,13 @@ class BookingRepositoryImpl implements BookingRepository {
   }
 
   @override
+  Future<Result<List<BookingEntity>>> getLandlordBookings() async {
+    final result = await _remoteDataSource.getLandlordBookings();
+    if (result.isFailure) return Result.failure(result.errorOrEmpty);
+    return Result.success(result.data!.map((m) => m.toEntity()).toList());
+  }
+
+  @override
   Future<Result<BookingEntity>> getBookingById(String id) async {
     final result = await _remoteDataSource.getBookingById(id);
     if (result.isFailure) return Result.failure(result.errorOrEmpty);

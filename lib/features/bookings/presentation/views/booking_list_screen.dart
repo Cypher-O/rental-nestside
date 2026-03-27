@@ -7,6 +7,7 @@ import '../../../../core/navigation/routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/empty_state_card.dart';
 import '../../../../core/widgets/shimmer_card.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../../../bookings/domain/entities/booking_entity.dart';
 import '../providers/booking_provider.dart';
 import '../widgets/booking_card.dart';
@@ -27,7 +28,11 @@ class _BookingListScreenState extends ConsumerState<BookingListScreen>
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(bookingListViewModelProvider.notifier).loadBookings(refresh: true);
+      final isLandlord =
+          ref.read(authViewModelProvider).user?.isLandlord == true;
+      ref
+          .read(bookingListViewModelProvider.notifier)
+          .loadBookings(refresh: true, isLandlord: isLandlord);
     });
   }
 
@@ -40,6 +45,8 @@ class _BookingListScreenState extends ConsumerState<BookingListScreen>
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(bookingListViewModelProvider);
+    final isLandlord =
+        ref.watch(authViewModelProvider).user?.isLandlord == true;
 
     final upcoming = state.bookings
         .where((b) =>
@@ -51,6 +58,10 @@ class _BookingListScreenState extends ConsumerState<BookingListScreen>
             b.status == BookingStatus.completed ||
             b.status == BookingStatus.cancelled)
         .toList();
+
+    Future<void> reload() => ref
+        .read(bookingListViewModelProvider.notifier)
+        .loadBookings(refresh: true, isLandlord: isLandlord);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -75,7 +86,9 @@ class _BookingListScreenState extends ConsumerState<BookingListScreen>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'My Bookings',
+                                isLandlord
+                                    ? 'Guest Bookings'
+                                    : 'My Bookings',
                                 style: GoogleFonts.poppins(
                                   fontSize: 24,
                                   fontWeight: FontWeight.w700,
@@ -85,7 +98,9 @@ class _BookingListScreenState extends ConsumerState<BookingListScreen>
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                '${state.bookings.length} total reservation${state.bookings.length != 1 ? 's' : ''}',
+                                isLandlord
+                                    ? '${state.bookings.length} booking${state.bookings.length != 1 ? 's' : ''} on your listings'
+                                    : '${state.bookings.length} total reservation${state.bookings.length != 1 ? 's' : ''}',
                                 style: GoogleFonts.poppins(
                                   fontSize: 12.5,
                                   color: AppColors.textSecondary,
@@ -116,7 +131,7 @@ class _BookingListScreenState extends ConsumerState<BookingListScreen>
                                 ),
                                 const SizedBox(width: 6),
                                 Text(
-                                  '${upcoming.length} upcoming',
+                                  '${upcoming.length} active',
                                   style: GoogleFonts.poppins(
                                     fontSize: 11.5,
                                     fontWeight: FontWeight.w600,
@@ -154,36 +169,35 @@ class _BookingListScreenState extends ConsumerState<BookingListScreen>
                     ? EmptyStateCard.error(
                         message:
                             state.errorMessage ?? 'Failed to load bookings',
-                        onRetry: () => ref
-                            .read(bookingListViewModelProvider.notifier)
-                            .loadBookings(refresh: true),
+                        onRetry: reload,
                       )
                     : TabBarView(
                         controller: _tabController,
                         children: [
                           _BookingTabView(
                             bookings: state.bookings,
-                            onRefresh: () => ref
-                                .read(bookingListViewModelProvider.notifier)
-                                .loadBookings(refresh: true),
+                            isLandlord: isLandlord,
+                            onRefresh: reload,
                           ),
                           _BookingTabView(
                             bookings: upcoming,
-                            emptyTitle: 'No upcoming bookings',
-                            emptyMessage:
-                                'Your confirmed bookings will appear here.',
-                            onRefresh: () => ref
-                                .read(bookingListViewModelProvider.notifier)
-                                .loadBookings(refresh: true),
+                            isLandlord: isLandlord,
+                            emptyTitle: isLandlord
+                                ? 'No active bookings'
+                                : 'No upcoming bookings',
+                            emptyMessage: isLandlord
+                                ? 'Confirmed guest bookings will appear here.'
+                                : 'Your confirmed bookings will appear here.',
+                            onRefresh: reload,
                           ),
                           _BookingTabView(
                             bookings: past,
+                            isLandlord: isLandlord,
                             emptyTitle: 'No past bookings',
-                            emptyMessage:
-                                'Your completed bookings will appear here.',
-                            onRefresh: () => ref
-                                .read(bookingListViewModelProvider.notifier)
-                                .loadBookings(refresh: true),
+                            emptyMessage: isLandlord
+                                ? 'Completed and cancelled bookings will appear here.'
+                                : 'Your completed bookings will appear here.',
+                            onRefresh: reload,
                           ),
                         ],
                       ),
@@ -282,12 +296,14 @@ class _Tab extends StatelessWidget {
 class _BookingTabView extends StatelessWidget {
   const _BookingTabView({
     required this.bookings,
+    this.isLandlord = false,
     this.emptyTitle = 'No bookings yet',
     this.emptyMessage = 'Your bookings will appear here.',
     required this.onRefresh,
   });
 
   final List<BookingEntity> bookings;
+  final bool isLandlord;
   final String emptyTitle;
   final String emptyMessage;
   final Future<void> Function() onRefresh;
@@ -311,8 +327,11 @@ class _BookingTabView extends StatelessWidget {
         separatorBuilder: (_, __) => const SizedBox(height: 12),
         itemBuilder: (context, index) => BookingCard(
           booking: bookings[index],
-          onTap: () => context
-              .push(AppRoutes.bookingDetailPath(bookings[index].id)),
+          showPropertyInfo: isLandlord,
+          onTap: isLandlord
+              ? null
+              : () => context.push(
+                  AppRoutes.bookingDetailPath(bookings[index].id)),
         ),
       ),
     );

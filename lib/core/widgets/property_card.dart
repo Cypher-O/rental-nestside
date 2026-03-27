@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../features/properties/domain/entities/property_entity.dart';
 import '../theme/app_colors.dart';
 import '../utils/currency_formatter.dart';
@@ -113,6 +114,28 @@ class PropertyCard extends StatelessWidget {
                       ),
                     ],
                   ),
+                  if (property.landlordName != null &&
+                      property.landlordName!.isNotEmpty) ...[
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        const Icon(Icons.person_outline,
+                            size: 12, color: AppColors.textLight),
+                        const SizedBox(width: 3),
+                        Expanded(
+                          child: Text(
+                            'Listed by ${property.landlordName}',
+                            style: GoogleFonts.poppins(
+                              fontSize: 11,
+                              color: AppColors.textLight,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                   const SizedBox(height: 8),
                   Row(
                     children: [

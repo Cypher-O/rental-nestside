@@ -40,6 +40,13 @@ class PaymentRepositoryImpl implements PaymentRepository {
   }
 
   @override
+  Future<Result<List<PaymentEntity>>> getLandlordPayments() async {
+    final result = await _remoteDataSource.getLandlordPayments();
+    if (result.isFailure) return Result.failure(result.errorOrEmpty);
+    return Result.success(result.data!.map((m) => m.toEntity()).toList());
+  }
+
+  @override
   Future<Result<String>> fetchPaymentConfig() {
     return _remoteDataSource.fetchPaymentConfig();
   }

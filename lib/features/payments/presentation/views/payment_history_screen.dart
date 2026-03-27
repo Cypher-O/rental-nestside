@@ -3,8 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/enums/app_enums.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../core/utils/currency_formatter.dart';
 import '../../../../core/widgets/empty_state_card.dart';
 import '../../../../core/widgets/shimmer_card.dart';
+import '../../../auth/presentation/providers/auth_provider.dart';
 import '../providers/payment_provider.dart';
 import '../widgets/payment_card.dart';
 
@@ -21,17 +23,25 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(paymentHistoryViewModelProvider.notifier).loadHistory(refresh: true);
+      final isLandlord =
+          ref.read(authViewModelProvider).user?.isLandlord == true;
+      ref
+          .read(paymentHistoryViewModelProvider.notifier)
+          .loadHistory(refresh: true, isLandlord: isLandlord);
     });
   }
 
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(paymentHistoryViewModelProvider);
+    final isLandlord =
+        ref.watch(authViewModelProvider).user?.isLandlord == true;
 
-    final successCount = state.payments
-        .where((p) => p.status == PaymentStatus.success)
-        .length;
+    final successPayments =
+        state.payments.where((p) => p.status == PaymentStatus.success).toList();
+    final successCount = successPayments.length;
+    final totalEarned =
+        successPayments.fold<double>(0, (sum, p) => sum + p.amount);
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -56,7 +66,7 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Payments',
+                                isLandlord ? 'Earnings' : 'Payments',
                                 style: GoogleFonts.poppins(
                                   fontSize: 24,
                                   fontWeight: FontWeight.w700,
@@ -66,7 +76,9 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                'Track all your transactions',
+                                isLandlord
+                                    ? 'Revenue from your listings'
+                                    : 'Track all your transactions',
                                 style: GoogleFonts.poppins(
                                   fontSize: 12.5,
                                   color: AppColors.textSecondary,
@@ -94,28 +106,53 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
                     // ── Summary row ─────────────────────────────────────────
                     if (state.payments.isNotEmpty) ...[
                       const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          _SummaryStat(
-                            label: 'Total',
-                            value: '${state.payments.length}',
-                            color: AppColors.primary,
-                          ),
-                          const SizedBox(width: 8),
-                          _SummaryStat(
-                            label: 'Successful',
-                            value: '$successCount',
-                            color: AppColors.success,
-                          ),
-                          const SizedBox(width: 8),
-                          _SummaryStat(
-                            label: 'Pending / Failed',
-                            value:
-                                '${state.payments.length - successCount}',
-                            color: AppColors.warning,
-                          ),
-                        ],
-                      ),
+                      if (isLandlord)
+                        Row(
+                          children: [
+                            _SummaryStat(
+                              label: 'Total Earned',
+                              value: CurrencyFormatter.format(totalEarned),
+                              color: AppColors.success,
+                              compact: true,
+                            ),
+                            const SizedBox(width: 8),
+                            _SummaryStat(
+                              label: 'Paid Out',
+                              value: '$successCount',
+                              color: AppColors.primary,
+                            ),
+                            const SizedBox(width: 8),
+                            _SummaryStat(
+                              label: 'Pending',
+                              value:
+                                  '${state.payments.length - successCount}',
+                              color: AppColors.warning,
+                            ),
+                          ],
+                        )
+                      else
+                        Row(
+                          children: [
+                            _SummaryStat(
+                              label: 'Total',
+                              value: '${state.payments.length}',
+                              color: AppColors.primary,
+                            ),
+                            const SizedBox(width: 8),
+                            _SummaryStat(
+                              label: 'Successful',
+                              value: '$successCount',
+                              color: AppColors.success,
+                            ),
+                            const SizedBox(width: 8),
+                            _SummaryStat(
+                              label: 'Pending / Failed',
+                              value:
+                                  '${state.payments.length - successCount}',
+                              color: AppColors.warning,
+                            ),
+                          ],
+                        ),
                     ],
                   ],
                 ),
@@ -139,14 +176,14 @@ class _PaymentHistoryScreenState extends ConsumerState<PaymentHistoryScreen> {
                             state.errorMessage ?? 'Failed to load payments',
                         onRetry: () => ref
                             .read(paymentHistoryViewModelProvider.notifier)
-                            .loadHistory(refresh: true),
+                            .loadHistory(refresh: true, isLandlord: isLandlord),
                       )
                     : state.payments.isEmpty
                         ? EmptyStateCard.noPayments()
                         : RefreshIndicator(
                             onRefresh: () => ref
                                 .read(paymentHistoryViewModelProvider.notifier)
-                                .loadHistory(refresh: true),
+                                .loadHistory(refresh: true, isLandlord: isLandlord),
                             color: AppColors.primary,
                             child: ListView.separated(
                               padding: const EdgeInsets.all(16),
@@ -169,11 +206,13 @@ class _SummaryStat extends StatelessWidget {
     required this.label,
     required this.value,
     required this.color,
+    this.compact = false,
   });
 
   final String label;
   final String value;
   final Color color;
+  final bool compact;
 
   @override
   Widget build(BuildContext context) {
@@ -191,10 +230,12 @@ class _SummaryStat extends StatelessWidget {
             Text(
               value,
               style: GoogleFonts.poppins(
-                fontSize: 18,
+                fontSize: compact ? 13 : 18,
                 fontWeight: FontWeight.w700,
                 color: color,
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
             Text(
               label,

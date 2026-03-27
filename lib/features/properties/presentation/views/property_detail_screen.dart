@@ -211,6 +211,24 @@ class _PropertyDetailScreenState
                               ),
                             ],
                           ),
+                          if (property.landlordName != null &&
+                              property.landlordName!.isNotEmpty) ...[
+                            const SizedBox(height: 6),
+                            Row(
+                              children: [
+                                const Icon(Icons.person_outline,
+                                    size: 15, color: AppColors.textLight),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Listed by ${property.landlordName}',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 12.5,
+                                    color: AppColors.textLight,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                           const SizedBox(height: 20),
                           PropertyInfoRow(
                             bedrooms: property.bedrooms,

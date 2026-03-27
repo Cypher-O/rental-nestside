@@ -12,10 +12,12 @@ class PaymentHistoryViewModel
 
   final PaymentRepository _repository;
 
-  Future<void> loadHistory({bool refresh = false}) async {
+  Future<void> loadHistory({bool refresh = false, bool isLandlord = false}) async {
     state = state.copyWith(status: PaymentInitStatus.loading);
 
-    final result = await _repository.getPaymentHistory();
+    final result = isLandlord
+        ? await _repository.getLandlordPayments()
+        : await _repository.getPaymentHistory();
 
     if (result.isSuccess) {
       state = state.copyWith(

@@ -8,13 +8,15 @@ class BookingListViewModel extends StateNotifier<BookingListState> {
 
   final BookingRepository _repository;
 
-  Future<void> loadBookings({bool refresh = false}) async {
+  Future<void> loadBookings({bool refresh = false, bool isLandlord = false}) async {
     state = state.copyWith(
       status: BookingListStatus.loading,
       bookings: refresh ? [] : state.bookings,
     );
 
-    final result = await _repository.getMyBookings();
+    final result = isLandlord
+        ? await _repository.getLandlordBookings()
+        : await _repository.getMyBookings();
 
     if (result.isSuccess) {
       state = state.copyWith(

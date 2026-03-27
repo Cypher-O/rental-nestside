@@ -4,6 +4,7 @@ class PropertyEntity {
   const PropertyEntity({
     required this.id,
     required this.ownerId,
+    this.landlordName,
     required this.title,
     this.description,
     required this.address,
@@ -22,6 +23,7 @@ class PropertyEntity {
 
   final String id;
   final String ownerId;
+  final String? landlordName;
   final String title;
   final String? description;
   final String address;

@@ -9,11 +9,13 @@ class BookingCard extends StatelessWidget {
   const BookingCard({
     super.key,
     required this.booking,
-    required this.onTap,
+    this.onTap,
+    this.showPropertyInfo = false,
   });
 
   final BookingEntity booking;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
+  final bool showPropertyInfo;
 
   @override
   Widget build(BuildContext context) {
@@ -76,18 +78,25 @@ class BookingCard extends StatelessWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        if (booking.propertyCity != null) ...[
+                        if (booking.propertyCity != null ||
+                            booking.propertyAddress != null) ...[
                           const SizedBox(height: 2),
                           Row(
                             children: [
                               const Icon(Icons.location_on,
                                   size: 11, color: AppColors.accent),
                               const SizedBox(width: 2),
-                              Text(
-                                booking.propertyCity!,
-                                style: GoogleFonts.poppins(
-                                  fontSize: 11,
-                                  color: AppColors.white.withAlpha(180),
+                              Flexible(
+                                child: Text(
+                                  showPropertyInfo && booking.propertyAddress != null
+                                      ? booking.propertyAddress!
+                                      : booking.propertyCity ?? '',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 11,
+                                    color: AppColors.white.withAlpha(180),
+                                  ),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                             ],
@@ -158,11 +167,18 @@ class BookingCard extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.people_outline,
-                            size: 13, color: AppColors.textSecondary),
+                        Icon(
+                          showPropertyInfo
+                              ? Icons.person_outline
+                              : Icons.people_outline,
+                          size: 13,
+                          color: AppColors.textSecondary,
+                        ),
                         const SizedBox(width: 4),
                         Text(
-                          '${booking.guests} guest${booking.guests != 1 ? 's' : ''}',
+                          showPropertyInfo
+                              ? 'Guest ···${booking.tenantId.length >= 6 ? booking.tenantId.substring(booking.tenantId.length - 6) : booking.tenantId}'
+                              : '${booking.guests} guest${booking.guests != 1 ? 's' : ''}',
                           style: GoogleFonts.poppins(
                             fontSize: 11,
                             color: AppColors.textSecondary,

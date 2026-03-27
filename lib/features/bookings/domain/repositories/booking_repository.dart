@@ -11,6 +11,7 @@ abstract class BookingRepository {
   });
 
   Future<Result<List<BookingEntity>>> getMyBookings();
+  Future<Result<List<BookingEntity>>> getLandlordBookings();
 
   Future<Result<BookingEntity>> getBookingById(String id);
 

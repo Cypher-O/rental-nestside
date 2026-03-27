@@ -16,12 +16,13 @@ class BookingModel {
     this.notes,
     this.createdAt,
     this.propertyTitle,
+    this.propertyAddress,
     this.propertyCity,
     this.propertyImage,
   });
 
   factory BookingModel.fromJson(Map<String, dynamic> json) {
-    // Handle nested property object if present
+    // Handle nested property object (tenant endpoint) or flat fields (landlord endpoint)
     final property = json['property'] as Map<String, dynamic>?;
 
     return BookingModel(
@@ -37,8 +38,10 @@ class BookingModel {
       guests: json['guests'] as int? ?? 1,
       notes: json['notes'] as String?,
       createdAt: json['created_at'] as String?,
-      propertyTitle: property?['title'] as String?,
-      propertyCity: property?['city'] as String?,
+      // Flat fields take priority (landlord endpoint), fall back to nested property object
+      propertyTitle: json['property_title'] as String? ?? property?['title'] as String?,
+      propertyAddress: json['property_address'] as String? ?? property?['address'] as String?,
+      propertyCity: json['property_city'] as String? ?? property?['city'] as String?,
       propertyImage: (property?['images'] as List<dynamic>?)?.isNotEmpty == true
           ? (property!['images'] as List<dynamic>).first as String
           : null,
@@ -58,6 +61,7 @@ class BookingModel {
   final String? notes;
   final String? createdAt;
   final String? propertyTitle;
+  final String? propertyAddress;
   final String? propertyCity;
   final String? propertyImage;
 
@@ -90,6 +94,7 @@ class BookingModel {
         notes: notes,
         createdAt: createdAt,
         propertyTitle: propertyTitle,
+        propertyAddress: propertyAddress,
         propertyCity: propertyCity,
         propertyImage: propertyImage,
       );

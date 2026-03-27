@@ -15,6 +15,7 @@ class BookingEntity {
     this.notes,
     this.createdAt,
     this.propertyTitle,
+    this.propertyAddress,
     this.propertyCity,
     this.propertyImage,
   });
@@ -32,6 +33,7 @@ class BookingEntity {
   final String? notes;
   final String? createdAt;
   final String? propertyTitle;
+  final String? propertyAddress;
   final String? propertyCity;
   final String? propertyImage;
 

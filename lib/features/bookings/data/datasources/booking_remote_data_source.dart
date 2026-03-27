@@ -6,6 +6,7 @@ import '../models/booking_model.dart';
 abstract class BookingRemoteDataSource {
   Future<Result<BookingModel>> createBooking(Map<String, dynamic> data);
   Future<Result<List<BookingModel>>> getMyBookings();
+  Future<Result<List<BookingModel>>> getLandlordBookings();
   Future<Result<BookingModel>> getBookingById(String id);
   Future<Result<BookingModel>> cancelBooking(String id);
 }
@@ -28,6 +29,21 @@ class BookingRemoteDataSourceImpl implements BookingRemoteDataSource {
   Future<Result<List<BookingModel>>> getMyBookings() {
     return _apiClient.get<List<BookingModel>>(
       endpoint: ApiConstants.bookings,
+      parser: (d) {
+        final list = d is List
+            ? d
+            : (d is Map ? d['items'] ?? d['bookings'] ?? [] : []);
+        return (list as List)
+            .map((e) => BookingModel.fromJson(e as Map<String, dynamic>))
+            .toList();
+      },
+    );
+  }
+
+  @override
+  Future<Result<List<BookingModel>>> getLandlordBookings() {
+    return _apiClient.get<List<BookingModel>>(
+      endpoint: ApiConstants.landlordBookings,
       parser: (d) {
         final list = d is List
             ? d

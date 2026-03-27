@@ -11,5 +11,6 @@ abstract class PaymentRepository {
   Future<Result<PaymentEntity>> verifyPayment(String reference);
 
   Future<Result<List<PaymentEntity>>> getPaymentHistory();
+  Future<Result<List<PaymentEntity>>> getLandlordPayments();
   Future<Result<String>> fetchPaymentConfig();
 }

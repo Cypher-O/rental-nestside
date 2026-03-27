@@ -8,6 +8,7 @@ abstract class PaymentRemoteDataSource {
       Map<String, dynamic> data);
   Future<Result<PaymentModel>> verifyPayment(String reference);
   Future<Result<List<PaymentModel>>> getPaymentHistory();
+  Future<Result<List<PaymentModel>>> getLandlordPayments();
   Future<Result<String>> fetchPaymentConfig();
 }
 
@@ -45,6 +46,21 @@ class PaymentRemoteDataSourceImpl implements PaymentRemoteDataSource {
       },
     );
     return result;
+  }
+
+  @override
+  Future<Result<List<PaymentModel>>> getLandlordPayments() {
+    return _apiClient.get<List<PaymentModel>>(
+      endpoint: ApiConstants.landlordPayments,
+      parser: (d) {
+        final list = d is List
+            ? d
+            : (d is Map ? d['items'] ?? d['payments'] ?? [] : []);
+        return (list as List)
+            .map((e) => PaymentModel.fromJson(e as Map<String, dynamic>))
+            .toList();
+      },
+    );
   }
 
   @override

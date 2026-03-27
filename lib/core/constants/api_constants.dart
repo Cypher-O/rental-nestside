@@ -19,6 +19,7 @@ class ApiConstants {
 
   // Bookings
   static const String bookings = '/api/v1/bookings';
+  static const String landlordBookings = '/api/v1/bookings/landlord';
   static String bookingById(String id) => '/api/v1/bookings/$id';
   static String cancelBooking(String id) => '/api/v1/bookings/$id/cancel';
 
@@ -28,6 +29,7 @@ class ApiConstants {
   static String verifyPayment(String reference) =>
       '/api/v1/payments/verify/$reference';
   static const String paymentHistory = '/api/v1/payments/history';
+  static const String landlordPayments = '/api/v1/payments/landlord';
 
   // Uploads
   static String propertyImages(String id) => '/api/v1/properties/$id/images';

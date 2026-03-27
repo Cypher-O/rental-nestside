@@ -5,6 +5,7 @@ class PropertyModel {
   const PropertyModel({
     required this.id,
     required this.ownerId,
+    this.landlordName,
     required this.title,
     this.description,
     required this.address,
@@ -26,6 +27,7 @@ class PropertyModel {
     return PropertyModel(
       id: json['id'] as String? ?? '',
       ownerId: json['owner_id'] as String? ?? '',
+      landlordName: json['landlord_name'] as String?,
       title: json['title'] as String? ?? '',
       description: json['description'] as String?,
       address: json['address'] as String? ?? '',
@@ -52,6 +54,7 @@ class PropertyModel {
 
   final String id;
   final String ownerId;
+  final String? landlordName;
   final String title;
   final String? description;
   final String address;
@@ -71,6 +74,7 @@ class PropertyModel {
   Map<String, dynamic> toJson() => {
         'id': id,
         'owner_id': ownerId,
+        'landlord_name': landlordName,
         'title': title,
         'description': description,
         'address': address,
@@ -91,6 +95,7 @@ class PropertyModel {
   PropertyEntity toEntity() => PropertyEntity(
         id: id,
         ownerId: ownerId,
+        landlordName: landlordName,
         title: title,
         description: description,
         address: address,
